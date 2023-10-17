@@ -1,14 +1,12 @@
-# Remove any comment lines that are not necessary
-
 name: Wasp (Semgrep) - SAST Check
 
 on:
   pull_request_target:
     branches:
-      - "master" # This will be the default branch of a repo
+      - "master" 
   schedule:
-    - cron: '0 */24 * * *' # Run everyday at 12 AM UTC
-  workflow_dispatch: # Run on demand
+    - cron: '0 */24 * * *' 
+  workflow_dispatch: 
 
 jobs:
   wasp-scan:
@@ -21,13 +19,13 @@ jobs:
       - name: Running Wasp scan
         uses: freshactions/wasp@latest
         env:
-          # Remove any of the following environment variables if you don't want to use them.
+          
           WASP_LOG_LEVEL: DEBUG
           WASP_SAVE_JSON: true
           WASP_SAVE_HTML: true
           WASP_SAVE_CSV: true
           WASP_FRESHRELEASE_PR_PROJECT_KEY: "FSALES"
-          # Dry run will not raise any tickets. Remove this if you don't want to run in dry run mode.
+          
           
           WASP_DRY_RUN: ${{ vars.SECURITY_APPSEC_WASP_DRY_RUN }}
 
@@ -40,14 +38,13 @@ jobs:
           WASP_SLACK_TOKEN: ${{ secrets.SECURITY_APPSEC_SLACK_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.SECURITY_APPSEC_GH_TOKEN }}
           
-      # Use this step to upload the scan report as an artifact.
+      
       - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: Wasp scan report archive
-          retention-days: 90
+          retention-days: ${{ vars.SECURITY_APPSEC_WASP_RESULT_RETENTION_DAYS }}
           path: |
             wasp-report.csv
             wasp-report.json
             wasp-report.html
-
